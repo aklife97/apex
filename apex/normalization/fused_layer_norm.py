@@ -182,9 +182,7 @@ def fused_layer_norm(input, normalized_shape, eps=1e-6):
 
 
 def mixed_dtype_fused_layer_norm_affine(input, weight, bias, normalized_shape, eps=1e-6):
-    args = _cast_if_autocast_enabled(input, weight, bias, normalized_shape, eps)
-    with torch.cuda.amp.autocast(enabled=False):
-        return FusedLayerNormAffineMixedDtypesFunction.apply(*args)
+    return FusedLayerNormAffineMixedDtypesFunction.apply(*args)
 
 
 def fused_rms_norm_affine(input, weight, normalized_shape, eps=1e-6):
