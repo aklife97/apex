@@ -7,6 +7,7 @@ from torch.nn import init
 from torch.nn import functional as F
 
 from apex._autocast_utils import _cast_if_autocast_enabled
+from torch.cuda.amp import custom_fwd, custom_bwd
 
 global fused_layer_norm_cuda
 fused_layer_norm_cuda = None
@@ -31,6 +32,7 @@ def manual_rms_norm(input, normalized_shape, weight, eps):
 
 class FusedLayerNormAffineFunction(torch.autograd.Function):
     @staticmethod
+    @custom_fwd
     def forward(ctx, input, weight, bias, normalized_shape, eps):
         global fused_layer_norm_cuda
         if fused_layer_norm_cuda is None:
@@ -47,6 +49,7 @@ class FusedLayerNormAffineFunction(torch.autograd.Function):
         return output
 
     @staticmethod
+    @custom_bwd
     def backward(ctx, grad_output):
         input_, weight_, bias_, mean, invvar = ctx.saved_tensors
         grad_input = grad_weight = grad_bias = None
@@ -84,6 +87,7 @@ class FusedRMSNormAffineFunction(torch.autograd.Function):
 class FusedLayerNormAffineMixedDtypesFunction(FusedLayerNormAffineFunction):
 
     @staticmethod
+    @custom_fwd
     def forward(ctx, input, weight, bias, normalized_shape, eps):
         global fused_layer_norm_cuda
         if fused_layer_norm_cuda is None:
