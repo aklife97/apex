@@ -182,7 +182,7 @@ def fused_layer_norm(input, normalized_shape, eps=1e-6):
 
 
 def mixed_dtype_fused_layer_norm_affine(input, weight, bias, normalized_shape, eps=1e-6):
-    return FusedLayerNormAffineMixedDtypesFunction.apply(*args)
+    return FusedLayerNormAffineMixedDtypesFunction.apply(input, weight, bias, normalized_shape, eps)
 
 
 def fused_rms_norm_affine(input, weight, normalized_shape, eps=1e-6):
